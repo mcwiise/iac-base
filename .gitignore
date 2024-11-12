@@ -20,7 +20,6 @@ crash.log
 *.tmp
 
 # IDE/Editor specific files
-.vscode/
 .idea/
 
 # OS generated files
