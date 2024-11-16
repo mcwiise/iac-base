@@ -1,0 +1,41 @@
+
+def prod = [
+    workingDir: "envs/prod",
+    varFile: "envs/prod/prod.tfvars"
+]
+
+task tfFormatCheck(type: Exec) {
+    description = "Format all code recursively"
+    group = "terraform"
+    commandLine "terraform", "fmt", "-recursive", "-check"  
+}
+
+task tfFormat(type: Exec) {
+    description = "Format all code recursively"
+    group = "terraform"
+    commandLine "terraform", "fmt", "-recursive"  
+}
+
+task tfInitProd(type: Exec) {
+    description = "Initialize Terraform working directory for prod"
+    group = "terraform"
+    
+    workingDir = file(prod.workingDir)
+    commandLine "terraform", "init", "-var-file", prod.varFile
+}
+
+task tfPlanProd(type: Exec) {
+    description = "Run Terraform plan for prod environment"
+    group = "terraform"
+    
+    workingDir = file(prod.workingDir)
+    commandLine "terraform", "plan", "-var-file", "prod.tfvars"
+}
+
+task tfApplyProd(type: Exec) {
+    description = "Run Terraform apply for prod environment"
+    group = "terraform"
+    
+    workingDir = file(prod.workingDir)
+    commandLine "terraform", "apply", "--auto-approve","-var-file", "prod.tfvars"
+}
