@@ -1,5 +1,5 @@
 module "security_group" {
-  source      = "../../modules/security_group"
+  source      = "../../modules/security-group"
   name        = "prod-jenkins-ci-server-sg"
   description = "Security group for Jenkins CI server"
   ingress_rules = [
