@@ -1,58 +1,113 @@
 # Base Infrastructure
-This repository contains Terraform scripts for provisioning the foundational infrastructure used in projects developed at Stamper Labs.
-These scripts provide a consistent and automated way to set up and manage essential resources.
 
-## Prerequisites
-* Install [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform).
-* Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions).
-* Install [Homebrew](https://brew.sh/).
-* Install [JDK 17](https://formulae.brew.sh/formula/openjdk@17)
-* SSH Key: Have your .pem key available for SSH access to your EC2 instances.
+This repository contains Terraform scripts for provisioning the foundational infrastructure used in projects developed at Stamper Labs.
+
+## Getting Started
+
+### Install the following tools
+
+* [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform).
+* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions).
+* [Homebrew](https://brew.sh/).
+* [JDK 17](https://formulae.brew.sh/formula/openjdk@17)
+
+### Setup profiles and credencials for AWS CLI
+
+Grab the secret and access keys from the AWS web console, and run the following steps:
+
+1. Open `config` file for edition:
+
+    ```bash
+    nano ~/.aws/config
+    ```
+
+2. Paste the following content:
+
+    ```ini
+    [profile tonnika.prod]
+    region = us-east-1
+    ```
+
+3. Open the `credentials` file for edition:
+
+    ```bash
+    nano ~/.aws/credentials
+    ```
+
+4. Paste the following content:
+
+    ```ini
+    [profile tonnika.prod]
+    aws_access_key_id = your_aws_access_key_id
+    aws_secret_access_key = your_aws_secret_access_key
+    ```
+
+5. Verify configuration:
+
+    ```bash
+    aws sts get-caller-identity --profile tonnika.prod
+    ```
 
 ## Installation
 
-### 1. Create `prod.tfvars` file
+Follow these steps to configure input variables for Terraform scripts and apply infrastructure changes:
 
-Create `./envs/prod/prod.tfvars` file and place the following content:
+1. Open `prod.tfvars` file for edition:
 
-```hcl
-aws_access_key = "your aws access key"
-aws_secret_key = "your aws secret key"
-region         = "us-east-1"
-ami_id         = "ami-06b21ccaeff8cd686"
-instance_type  = "t2.micro"
-env            = "prod"
-```
-### 2. Initialize terraform working directory
+    ```bash
+    nano ./envs/prod/prod.tfvars
+    ```
 
-```shell
-./gradlew tfInitProd
-```
-### 3. Review the terraform plan
+2. Paste the following content:
 
-```shell
-./gradlew tfPlanProd
-```
+    ```hcl
+    aws_access_key = "your aws access key"
+    aws_secret_key = "your aws secret key"
+    region         = "us-east-1"
+    ami_id         = "ami-06b21ccaeff8cd686"
+    instance_type  = "t2.micro"
+    env            = "prod"
+    ```
 
-### 4. Apply changes
+3. Initialize terraform working directory:
 
-```shell
-./gradlew tfApplyProd
-```
+    ```bash
+    ./gradlew tfInitProd
+    ```
 
-## Configurations
+4. Review the terraform plan:
 
-### 1. Set Up Jenkins with HTTPS
+    ```bash
+    ./gradlew tfPlanProd
+    ```
 
-* SSH into the Jenkins EC2 Instance
+5. Apply changes:
 
-* Edit the Jenkins Service Configuration
+    ```bash
+    # Be carefull, this command by pass the manual confirmation
+    ./gradlew tfApplyProd
+    ```
+
+6. Destroy changes:
+
+    ```bash
+    # Be carefull, this command by pass the manual confirmation
+    ./gradlew tfDestroyProd
+    ```
+
+## Additional Configuration
+
+### Configure jenkins to start with HTTPS
+
+1. SSH into the Jenkins EC2 Instance:
+
+2. Edit the Jenkins Service Configuration
 
     ```shell
     sudo systemctl edit jenkins
     ```
 
-* Add HTTPS Configuration
+3. Add HTTPS Configuration
 
     ```bash
     [Service]
@@ -62,20 +117,22 @@ env            = "prod"
     Environment="JENKINS_HTTPS_KEYSTORE_PASSWORD=password"
     ```
 
-* Reload and Restart Jenkins
+4. Reload and Restart Jenkins
 
     ```shell
     sudo systemctl daemon-reload
     sudo systemctl restart jenkins
     ```
 
-* Verify Jenkins Status
+5. Verify Jenkins Status
 
     ```shell
     sudo systemctl status jenkins
     ```
 
 ## Command Line Interface
+
+The following are the available commands
 
 ```shell
 # Initialize terraform working directory

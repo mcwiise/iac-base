@@ -37,5 +37,13 @@ task tfApplyProd(type: Exec) {
     group = "terraform"
     
     workingDir = file(prod.workingDir)
-    commandLine "terraform", "apply", "--auto-approve","-var-file", "prod.tfvars"
+    commandLine "terraform", "apply", "--auto-approve", "-var-file", "prod.tfvars"
+}
+
+task tfDestroyProd(type: Exec) {
+    description = "Run Terraform destroy for prod environment"
+    group = "terraform"
+    
+    workingDir = file(prod.workingDir)
+    commandLine "terraform", "destroy", "--auto-approve", "-var-file", "prod.tfvars"
 }
