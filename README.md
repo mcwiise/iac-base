@@ -54,23 +54,57 @@ Grab the secret and access keys from the AWS web console, and run the following 
 
 Follow these steps to configure input variables for Terraform scripts and apply infrastructure changes:
 
-1. Create a secret containing the public key for SSH access to the EC2 instance:
+1. Open `.zshrc` file for edition, and add AWS profile env variable
+
+   ```bash
+   # Set up the default profile
+   export AWS_PROFILE="stamper.prod"
+   ```
+
+2. Create the tfstate bucket and enable versioning:
+
+   ```bash
+   aws --profile stamper.prod s3api create-bucket \
+      --bucket prod-stamperlabs-tfstate-bucket \
+      --region us-east-1 \
+   ```
+
+3. Enable bucket versioning:
+
+   ```
+   aws --profile stamper.prod s3api put-bucket-versioning \
+      --bucket prod-stamperlabs-tfstate-bucket \
+      --versioning-configuration Status=Enabled
+   ```
+
+4. Create the tfstate lock table:
+
+   ```bash
+   aws --profile stamper.prod dynamodb create-table \
+      --table-name tfstate-locks \
+      --attribute-definitions AttributeName=LockID,AttributeType=S \
+      --key-schema AttributeName=LockID,KeyType=HASH \
+      --billing-mode PAY_PER_REQUEST \
+      --region us-east-1
+   ```
+
+5. Create a secret containing the public key for SSH access to the EC2 instance:
 
    ```bash
    aws --profile stamper.prod secretsmanager create-secret \
-       --name prod-ec2-jenkins-piblic-key \
-       --description "public key to ssh jenkins ec2 instance to" \
-       --secret-string '{"public-key":"the ssh key"}' \
-       --tags Key=Environment,Value=Production
+      --name prod-ec2-jenkins-piblic-key \
+      --description "public key to ssh jenkins ec2 instance to" \
+      --secret-string '{"public-key":"the ssh key"}' \
+      --tags Key=Environment,Value=Production
    ```
 
-2. Open `prod.tfvars` file for edition:
+6. Open `prod.tfvars` file for edition:
 
    ```bash
    nano ./envs/prod/prod.tfvars
    ```
 
-3. Paste the following content:
+7. Paste the following content:
 
    ```hcl
    aws_access_key = "your aws access key"
@@ -81,7 +115,7 @@ Follow these steps to configure input variables for Terraform scripts and apply 
    env            = "prod"
    ```
 
-4. Apply changes to infrastructure:
+8. Apply changes to infrastructure:
 
    ```bash
    # Initialize terraform working directory
