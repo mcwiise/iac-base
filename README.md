@@ -6,10 +6,10 @@ This repository contains Terraform scripts for provisioning the foundational inf
 
 ### Install the following tools
 
-* [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform).
-* [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions).
-* [Homebrew](https://brew.sh/).
-* [JDK 17](https://formulae.brew.sh/formula/openjdk@17)
+- [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform).
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#getting-started-install-instructions).
+- [Homebrew](https://brew.sh/).
+- [JDK 17](https://formulae.brew.sh/formula/openjdk@17)
 
 ### Setup profiles and credencials for AWS CLI
 
@@ -17,118 +17,83 @@ Grab the secret and access keys from the AWS web console, and run the following 
 
 1. Open `config` file for edition:
 
-    ```bash
-    nano ~/.aws/config
-    ```
+   ```bash
+   # Create the .aws folder in case it does not exist
+   mkdir ~/.aws/
+   nano ~/.aws/config
+   ```
 
 2. Paste the following content:
 
-    ```ini
-    [profile tonnika.prod]
-    region = us-east-1
-    ```
+   ```ini
+   [profile stamper.prod]
+   region = us-east-1
+   ```
 
 3. Open the `credentials` file for edition:
 
-    ```bash
-    nano ~/.aws/credentials
-    ```
+   ```bash
+   nano ~/.aws/credentials
+   ```
 
 4. Paste the following content:
 
-    ```ini
-    [profile tonnika.prod]
-    aws_access_key_id = your_aws_access_key_id
-    aws_secret_access_key = your_aws_secret_access_key
-    ```
+   ```ini
+   [stamper.prod]
+   aws_access_key_id = your_aws_access_key_id
+   aws_secret_access_key = your_aws_secret_access_key
+   ```
 
 5. Verify configuration:
 
-    ```bash
-    aws sts get-caller-identity --profile tonnika.prod
-    ```
+   ```bash
+   aws sts get-caller-identity --profile stamper.prod
+   ```
 
 ## Installation
 
 Follow these steps to configure input variables for Terraform scripts and apply infrastructure changes:
 
-1. Open `prod.tfvars` file for edition:
+1. Create a secret containing the public key for SSH access to the EC2 instance:
 
-    ```bash
-    nano ./envs/prod/prod.tfvars
-    ```
+   ```bash
+   aws --profile stamper.prod secretsmanager create-secret \
+       --name prod-ec2-jenkins-piblic-key \
+       --description "public key to ssh jenkins ec2 instance to" \
+       --secret-string '{"public-key":"the ssh key"}' \
+       --tags Key=Environment,Value=Production
+   ```
 
-2. Paste the following content:
+2. Open `prod.tfvars` file for edition:
 
-    ```hcl
-    aws_access_key = "your aws access key"
-    aws_secret_key = "your aws secret key"
-    region         = "us-east-1"
-    ami_id         = "ami-06b21ccaeff8cd686"
-    instance_type  = "t2.micro"
-    env            = "prod"
-    ```
+   ```bash
+   nano ./envs/prod/prod.tfvars
+   ```
 
-3. Initialize terraform working directory:
+3. Paste the following content:
 
-    ```bash
-    ./gradlew tfInitProd
-    ```
+   ```hcl
+   aws_access_key = "your aws access key"
+   aws_secret_key = "your aws secret key"
+   region         = "us-east-1"
+   ami_id         = "ami-06b21ccaeff8cd686"
+   instance_type  = "t2.micro"
+   env            = "prod"
+   ```
 
-4. Review the terraform plan:
+4. Apply changes to infrastructure:
 
-    ```bash
-    ./gradlew tfPlanProd
-    ```
+   ```bash
+   # Initialize terraform working directory
+   ./gradlew tfInitProd
 
-5. Apply changes:
+   # Review the terraform plan
+   ./gradlew tfPlanProd
 
-    ```bash
-    # Be carefull, this command by pass the manual confirmation
-    ./gradlew tfApplyProd
-    ```
-
-6. Destroy changes:
-
-    ```bash
-    # Be carefull, this command by pass the manual confirmation
-    ./gradlew tfDestroyProd
-    ```
-
-## Additional Configuration
-
-### Configure jenkins to start with HTTPS
-
-1. SSH into the Jenkins EC2 Instance:
-
-2. Edit the Jenkins Service Configuration
-
-    ```shell
-    sudo systemctl edit jenkins
-    ```
-
-3. Add HTTPS Configuration
-
-    ```bash
-    [Service]
-    Environment="JENKINS_PORT=-1"
-    Environment="JENKINS_HTTPS_PORT=8443"
-    Environment="JENKINS_HTTPS_KEYSTORE=/var/lib/jenkins/.ssl/server.jks"
-    Environment="JENKINS_HTTPS_KEYSTORE_PASSWORD=password"
-    ```
-
-4. Reload and Restart Jenkins
-
-    ```shell
-    sudo systemctl daemon-reload
-    sudo systemctl restart jenkins
-    ```
-
-5. Verify Jenkins Status
-
-    ```shell
-    sudo systemctl status jenkins
-    ```
+   # Apply changes
+   # Be careful, this command by pass the manual confirmation
+   ./gradlew tfApplyProd
+   ```
 
 ## Command Line Interface
 
@@ -142,7 +107,12 @@ The following are the available commands
 ./gradlew tfPlanProd
 
 # Apply changes to the infrastructure
+# bypassing manual confirmation
 ./gradlew tfApplyProd
+
+# Destroy changes made to the infrastructure
+# bypassing manual confirmation
+./gradlew tfDestroyProd
 
 # Check for formatting issues in source code
 ./gradlew tfFormatCheck
