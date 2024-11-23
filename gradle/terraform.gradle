@@ -47,3 +47,11 @@ task tfDestroyProd(type: Exec) {
     workingDir = file(prod.workingDir)
     commandLine "terraform", "destroy", "--auto-approve", "-var-file", "prod.tfvars"
 }
+
+task tfOutputsProd(type: Exec) {
+    description = "Print out all output variables"
+    group = "terraform"
+    
+    workingDir = file(prod.workingDir)
+    commandLine "terraform", "output"
+}
