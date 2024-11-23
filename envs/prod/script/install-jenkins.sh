@@ -12,6 +12,7 @@ sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
 # Install Jenkins
 sudo dnf install jenkins -y
+sudo dnf install git -y
 
 # create and install a self signed certificate
 sudo su jenkins
