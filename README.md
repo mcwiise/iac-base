@@ -11,7 +11,7 @@ This repository contains Terraform scripts for provisioning the foundational inf
 - [Homebrew](https://brew.sh/).
 - [JDK 17](https://formulae.brew.sh/formula/openjdk@17)
 
-### Setup profiles and credencials for AWS CLI
+### Setup profiles and credencials for AWS CLI:
 
 Grab the secret and access keys from the AWS web console, and run the following steps:
 
